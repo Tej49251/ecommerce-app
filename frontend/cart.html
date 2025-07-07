@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>🛒 Cart | Flipkart Lite</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <style>
+    th, td { vertical-align: middle; }
+    .table td input[type='number'] {
+      width: 80px;
+    }
+  </style>
+</head>
+<body>
+  <!-- 🧭 Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="products.html">🛍️ Ecommerce Lite</a>
+      <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navMenu">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navMenu">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item"><a class="nav-link" href="products.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link active" href="cart.html">Cart</a></li>
+          <li class="nav-item"><a class="nav-link" href="orders.html">Orders</a></li>
+        </ul>
+        <div class="d-flex">
+          <input type="search" id="searchInput" class="form-control me-2" placeholder="Search products..." />
+          <button class="btn btn-outline-light" onclick="searchProducts()">Search</button>
+          <button class="btn btn-danger ms-2" onclick="logout()">Logout</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 🛒 Cart Section -->
+  <div class="container mt-4">
+    <h2>Your Shopping Cart</h2>
+    <div class="table-responsive">
+      <table class="table table-bordered mt-3">
+        <thead class="table-light">
+          <tr>
+            <th>Name</th>
+            <th>Price</th>
+            <th>Quantity</th>
+            <th>Total</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="cartItems"></tbody>
+      </table>
+    </div>
+    <div class="d-flex justify-content-between">
+      <div class="fs-5 fw-bold">Grand Total: <span id="grandTotal">₹0.00</span></div>
+      <div>
+        <button class="btn btn-success" onclick="placeOrder()">Place Order</button>
+        <a href="products.html" class="btn btn-secondary ms-2">Continue Shopping</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    const jwtToken = localStorage.getItem("jwtToken");
+    let cartData = [];
+
+    function logout() {
+      localStorage.removeItem("jwtToken");
+      window.location.href = "login.html";
+    }
+
+    function searchProducts() {
+      const query = document.getElementById("searchInput").value.trim();
+      if (query) {
+        window.location.href = `products.html?search=${encodeURIComponent(query)}`;
+      }
+    }
+
+    async function fetchCart() {
+      const res = await fetch("http://localhost:3000/cart", {
+        headers: { Authorization: `Bearer ${jwtToken}` }
+      });
+
+      cartData = await res.json();
+      renderCart();
+    }
+
+    function renderCart() {
+      const table = document.getElementById("cartItems");
+      const totalDisplay = document.getElementById("grandTotal");
+      table.innerHTML = "";
+
+      if (!cartData.length) {
+        table.innerHTML = `<tr><td colspan="5" class="text-center">🛒 Your cart is empty</td></tr>`;
+        totalDisplay.textContent = "₹0.00";
+        return;
+      }
+
+      let grandTotal = 0;
+
+      cartData.forEach(item => {
+        const itemTotal = item.price * item.quantity;
+        grandTotal += itemTotal;
+
+        table.innerHTML += `
+          <tr>
+            <td>${item.name}</td>
+            <td>₹${item.price.toFixed(2)}</td>
+            <td>
+              <input type="number" min="1" value="${item.quantity}"
+                onchange="handleQuantityChange(${item.product_id}, this.value)" />
+            </td>
+            <td id="total-${item.product_id}">₹${itemTotal.toFixed(2)}</td>
+            <td>
+              <button class="btn btn-sm btn-danger" onclick="removeItem(${item.product_id})">Remove</button>
+            </td>
+          </tr>
+        `;
+      });
+
+      totalDisplay.textContent = `₹${grandTotal.toFixed(2)}`;
+    }
+
+    function handleQuantityChange(productId, rawQty) {
+      const qty = Math.max(1, parseInt(rawQty));
+      const item = cartData.find(p => p.product_id === productId);
+      if (!item) return;
+
+      item.quantity = qty;
+
+      const itemTotal = item.price * qty;
+      document.getElementById(`total-${productId}`).textContent = `₹${itemTotal.toFixed(2)}`;
+
+      const grandTotal = cartData.reduce((sum, p) => sum + p.price * p.quantity, 0);
+      document.getElementById("grandTotal").textContent = `₹${grandTotal.toFixed(2)}`;
+
+      updateQuantity(productId, qty);
+    }
+
+    async function updateQuantity(productId, quantity) {
+      await fetch("http://localhost:3000/cart", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${jwtToken}`
+        },
+        body: JSON.stringify({ productId, quantity })
+      });
+    }
+
+    async function removeItem(productId) {
+      await fetch(`http://localhost:3000/cart/${productId}`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${jwtToken}` }
+      });
+
+      cartData = cartData.filter(p => p.product_id !== productId);
+      renderCart();
+    }
+
+    async function placeOrder() {
+      const res = await fetch("http://localhost:3000/orders", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${jwtToken}` }
+      });
+
+      if (res.ok) {
+        alert("✅ Order placed!");
+        cartData = [];
+        renderCart();
+      } else {
+        alert("🚫 Failed to place order");
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", fetchCart);
+  </script>
+</body>
+</html>

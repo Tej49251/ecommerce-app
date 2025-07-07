@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flipkart Lite | Home</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    .carousel-img {
+      height: 400px;
+      object-fit: cover;
+    }
+    .card-img-top {
+      height: 180px;
+      object-fit: contain;
+      background-color: #f8f8f8;
+    }
+    .discount-card {
+      min-height: 180px;
+      background-size: cover;
+      background-position: center;
+      border-radius: 8px;
+      color: #fff;
+      display: flex;
+      align-items: end;
+      padding: 1rem;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <!-- 🧭 Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="#">🛍️ Ecommerce Lite</a>
+      <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item"><a class="nav-link active" href="#">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="products.html">Products</a></li>
+        </ul>
+        <div class="d-flex">
+          <a href="login.html" class="btn btn-outline-light me-2">Login</a>
+          <a href="register.html" class="btn btn-light">Register</a>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- 🖼️ Carousel -->
+  <div id="carouselExample" class="carousel slide mb-4" data-bs-ride="carousel">
+    <div class="carousel-inner">
+      <div class="carousel-item active">
+        <img src="https://images.pexels.com/photos/5632402/pexels-photo-5632402.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=500" class="d-block w-100 carousel-img" alt="Sale banner 1">
+      </div>
+      <div class="carousel-item">
+        <img src="https://images.unsplash.com/photo-1616441066765-6c338f1f0a6d?auto=format&fit=crop&w=1200&q=80" class="d-block w-100 carousel-img" alt="Sale banner 2">
+      </div>
+      <div class="carousel-item">
+        <img src="https://cdn.pixabay.com/photo/2016/12/01/17/28/shopping-1872998_1920.jpg" class="d-block w-100 carousel-img" alt="Sale banner 3">
+      </div>
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExample" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon"></span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselExample" data-bs-slide="next">
+      <span class="carousel-control-next-icon"></span>
+    </button>
+  </div>
+
+  <!-- 💸 Discount Cards -->
+  <div class="container mb-5">
+    <h3 class="mb-3">Deals & Offers</h3>
+    <div class="row g-3">
+      <div class="col-md-4">
+        <div class="discount-card text-white" style="background-image: url('https://cdn.pixabay.com/photo/2016/11/19/14/00/girl-1839936_1280.jpg');">
+          50% off on Fashion
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="discount-card text-white" style="background-image: url('https://cdn.pixabay.com/photo/2014/09/27/19/32/shopping-464664_1280.jpg');">
+          Buy 1 Get 1 on Electronics
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="discount-card text-white" style="background-image: url('https://cdn.pixabay.com/photo/2020/03/26/17/39/shoes-4979213_1280.jpg');">
+          Upto 60% off on Footwear
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🎁 Featured Products -->
+  <div class="container mb-5">
+    <h3 class="mb-3">Featured Products</h3>
+    <div class="row">
+      <div class="col-md-4 mb-4">
+        <div class="card h-100 shadow-sm">
+          <img src="https://cdn.pixabay.com/photo/2020/01/15/15/02/headphones-4765063_1280.jpg" class="card-img-top" alt="Headphones">
+          <div class="card-body">
+            <h5 class="card-title">Bluetooth Headphones</h5>
+            <p class="card-text">Noise-cancelling, wireless, premium finish.</p>
+            <div class="fw-bold text-success">₹1299</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="card h-100 shadow-sm">
+          <img src="https://cdn.pixabay.com/photo/2016/01/19/15/05/smartphone-1149911_1280.jpg" class="card-img-top" alt="Smartphone">
+          <div class="card-body">
+            <h5 class="card-title">Smartphone X</h5>
+            <p class="card-text">AMOLED display, 128GB storage, 48MP camera.</p>
+            <div class="fw-bold text-success">₹9999</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4 mb-4">
+        <div class="card h-100 shadow-sm">
+          <img src="https://cdn.pixabay.com/photo/2016/11/19/13/52/wrist-watch-1839228_1280.jpg" class="card-img-top" alt="Watch">
+          <div class="card-body">
+            <h5 class="card-title">Classic Watch</h5>
+            <p class="card-text">Elegant design, water resistant, leather strap.</p>
+            <div class="fw-bold text-success">₹799</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="bg-dark text-white text-center py-3">
+    &copy; 2025 Ecommerce Lite &mdash; All rights reserved.
+  </footer>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

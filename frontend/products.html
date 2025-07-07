@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Shop | Products</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <style>
+    .card-img-top {
+      max-height: 180px;
+      object-fit: contain;
+      background-color: #f8f8f8;
+    }
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+    .card-footer {
+      background-color: transparent;
+      border-top: none;
+    }
+  </style>
+</head>
+<body>
+  <!-- 🧭 Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-3">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="products.html">🛒Ecommerce Lite</a>
+      <button class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbarContent">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarContent">
+        <ul class="navbar-nav me-auto">
+          <li class="nav-item"><a class="nav-link active" href="products.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="cart.html">Cart</a></li>
+          <li class="nav-item"><a class="nav-link" href="orders.html">Orders</a></li>
+        </ul>
+        <div class="d-flex gap-2">
+          <input class="form-control" type="search" id="searchInput" placeholder="Search products..." />
+          <select class="form-select" id="sortSelect" style="width: auto;">
+            <option value="">Sort</option>
+            <option value="asc">Price ↑</option>
+            <option value="desc">Price ↓</option>
+          </select>
+          <button class="btn btn-outline-light" onclick="loadProducts()">Search</button>
+          <button class="btn btn-danger" onclick="logout()">Logout</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="row" id="productList"></div>
+    <div class="d-flex justify-content-between mt-4">
+      <button class="btn btn-outline-secondary" onclick="prevPage()">Previous</button>
+      <button class="btn btn-outline-secondary" onclick="nextPage()">Next</button>
+    </div>
+  </div>
+
+  <!-- 🔗 Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    const jwtToken = localStorage.getItem("jwtToken");
+    let page = 1;
+    const limit = 6;
+
+    function logout() {
+      localStorage.removeItem("jwtToken");
+      window.location.href = "login.html";
+    }
+
+    function nextPage() { page++; loadProducts(); }
+    function prevPage() { if (page > 1) page--; loadProducts(); }
+
+    async function loadProducts() {
+      const search = document.getElementById("searchInput").value.trim();
+      const sort = document.getElementById("sortSelect").value;
+
+      const url = `http://localhost:3000/products?search=${encodeURIComponent(search)}&sort=${sort}&page=${page}&limit=${limit}`;
+      const res = await fetch(url, {
+        headers: { Authorization: `Bearer ${jwtToken}` }
+      });
+
+      const products = await res.json();
+      const container = document.getElementById("productList");
+      container.innerHTML = "";
+
+      if (!products.length && page > 1) {
+        page--;
+        alert("No more products.");
+        return;
+      }
+
+      products.forEach(p => {
+        container.innerHTML += `
+          <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+              <img src="${p.image_url || 'https://via.placeholder.com/300x180'}" class="card-img-top" alt="${p.name}">
+              <div class="card-body">
+                <h5 class="card-title">${p.name}</h5>
+                <p class="card-text text-muted">${p.description || ''}</p>
+                <ul class="list-unstyled">
+                  <li><strong>Category:</strong> ${p.category || '—'}</li>
+                  <li><strong>Price:</strong> ₹${p.price.toFixed(2)}</li>
+                  <li><strong>Stock:</strong> ${p.stock ?? 'N/A'}</li>
+                </ul>
+              </div>
+              <div class="card-footer">
+                <div class="input-group">
+                  <input type="number" id="qty-${p.product_id}" class="form-control" min="1" value="1" />
+                  <button class="btn btn-success" onclick="addToCart(${p.product_id})">Add to Cart</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    async function addToCart(productId) {
+      const qtyInput = document.getElementById(`qty-${productId}`);
+      const quantity = parseInt(qtyInput.value);
+      if (!jwtToken) return alert("Please log in first.");
+      await fetch("http://localhost:3000/cart", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${jwtToken}`
+        },
+        body: JSON.stringify({ productId, quantity })
+      });
+      alert("✅ Product added to cart!");
+    }
+
+    document.addEventListener("DOMContentLoaded", loadProducts);
+  </script>
+</body>
+</html>
